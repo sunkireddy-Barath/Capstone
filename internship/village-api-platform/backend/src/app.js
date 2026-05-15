@@ -39,6 +39,24 @@ if (!env.IS_PRODUCTION) {
 // ─── Request Logging ──────────────────────────────────────────────────────────
 app.use(requestLogger);
 
+// ─── Root ─────────────────────────────────────────────────────────────────────
+app.get('/', (req, res) => {
+  res.json({
+    name: 'Village API Platform',
+    version: '1.0.0',
+    status: 'running',
+    endpoints: {
+      health: '/health',
+      ready: '/ready',
+      auth: '/api/auth',
+      geography: `/api/${env.API_VERSION}`,
+      search: `/api/${env.API_VERSION}/search`,
+      b2b: '/api/b2b',
+      admin: '/api/admin',
+    },
+  });
+});
+
 // ─── Health & Readiness ───────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.json({

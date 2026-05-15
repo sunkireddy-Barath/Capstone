@@ -96,6 +96,9 @@
   .bg-gray-750 {
     background-color: #2a2d35;
   }
+  .animate-orb-1 { animation: orbFloat1 9s ease-in-out infinite; }
+  .animate-orb-2 { animation: orbFloat2 12s ease-in-out infinite; }
+  .animate-orb-3 { animation: orbFloat3 15s ease-in-out infinite; }
 }
 
 @keyframes fadeIn {
@@ -111,4 +114,19 @@
 @keyframes slideInRight {
   from { opacity: 0; transform: translateX(12px); }
   to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes orbFloat1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(40px, -30px) scale(1.06); }
+  66%      { transform: translate(-25px, 15px) scale(0.94); }
+}
+@keyframes orbFloat2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33%      { transform: translate(-50px, 35px) scale(1.08); }
+  66%      { transform: translate(30px, -20px) scale(0.93); }
+}
+@keyframes orbFloat3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(20px, 30px) scale(1.12); }
 }

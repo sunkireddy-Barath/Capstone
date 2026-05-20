@@ -4,15 +4,36 @@
 
 ---
 
-## Live URLs
+## Live Deployment
 
 | Service | URL | Status |
 |---|---|---|
-| **Frontend** | https://frontend-virid-ten-21.vercel.app | ![live](https://img.shields.io/badge/status-live-brightgreen) |
+| **Frontend App** | https://frontend-virid-ten-21.vercel.app | ![live](https://img.shields.io/badge/status-live-brightgreen) |
 | **Backend API** | https://backend-theta-two-68.vercel.app | ![live](https://img.shields.io/badge/status-live-brightgreen) |
 | **Health Check** | https://backend-theta-two-68.vercel.app/health | ![live](https://img.shields.io/badge/status-live-brightgreen) |
 | **Readiness Check** | https://backend-theta-two-68.vercel.app/ready | ![live](https://img.shields.io/badge/status-live-brightgreen) |
 | **API Root** | https://backend-theta-two-68.vercel.app/ | ![live](https://img.shields.io/badge/status-live-brightgreen) |
+
+---
+
+## Admin Login Credentials
+
+| Field | Value |
+|---|---|
+| **URL** | https://frontend-virid-ten-21.vercel.app/login |
+| **Email** | `admin@villageapi.in` |
+| **Password** | `Admin@123456` |
+| **Role** | `ADMIN` — full access to all admin routes |
+
+> The admin account has `UNLIMITED` plan and access to all system dashboards, user management, API key management, and request logs.
+
+**Client (regular user) demo:**
+
+| Field | Value |
+|---|---|
+| **Email** | Any registered account |
+| **Register at** | https://frontend-virid-ten-21.vercel.app/register |
+| **Plan** | `FREE` — 1,000 API calls/day, upgrade available |
 
 ---
 

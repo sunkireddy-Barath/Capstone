@@ -37,23 +37,23 @@ const getSystemDailyUsage = (days = 30) => analyticsRepo.getDailyUsageSystem(day
 const getTopEndpoints = (limit = 10) => analyticsRepo.getTopEndpoints(limit);
 
 const getUserDashboard = async (userId) => {
+  const apiKeys = await apiKeyRepo.findAllByUser(userId);
+
   const [
     totalRequests,
     requestsToday,
-    apiKeys,
     dailyUsage,
     recentLogs,
   ] = await Promise.all([
     analyticsRepo.getRequestsByUser(userId, 9999),
-    analyticsRepo.getTotalRequests(),
-    apiKeyRepo.findAllByUser(userId),
+    analyticsRepo.getRequestsToday(),
     analyticsRepo.getDailyUsageByUser(userId, 30),
     analyticsRepo.getRecentLogs(20, userId),
   ]);
 
   return {
     totalRequests,
-    requestsToday: await analyticsRepo.getRequestsToday(),
+    requestsToday,
     activeApiKeys: apiKeys.filter((k) => k.isActive).length,
     totalApiKeys: apiKeys.length,
     dailyUsage,

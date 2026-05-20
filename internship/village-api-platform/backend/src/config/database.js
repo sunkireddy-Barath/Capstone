@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
 const env = require('./env');
+const logger = require('../utils/logger');
 
 const globalForPrisma = globalThis;
 
@@ -29,8 +30,7 @@ process.on('SIGINT', async () => { await shutdown(); process.exit(0); });
 process.on('SIGTERM', async () => { await shutdown(); process.exit(0); });
 
 prisma.$connect().catch((err) => {
-  console.error('Database connection failed:', err.message);
-  process.exit(1);
+  logger.error('Database connection failed:', err.message);
 });
 
 module.exports = prisma;

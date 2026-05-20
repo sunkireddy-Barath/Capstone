@@ -27,7 +27,7 @@ export default function Layout({ children }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <span className="text-sm font-bold text-gray-200">Village API Platform</span>
+            <span className="text-sm font-bold text-gray-200">CapStone</span>
           </div>
         </div>
 

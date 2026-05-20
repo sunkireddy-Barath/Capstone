@@ -1,5 +1,5 @@
 {
-  "name": "village-api-backend",
+  "name": "capstone-backend",
   "version": "1.0.0",
   "description": "All India Villages API Platform - Production Backend",
   "main": "src/app.js",

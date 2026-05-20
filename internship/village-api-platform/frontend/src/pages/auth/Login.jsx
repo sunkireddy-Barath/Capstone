@@ -49,7 +49,7 @@ export default function Login() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
           </div>
-          <span className="text-sm font-semibold text-white tracking-tight">Village API Platform</span>
+          <span className="text-sm font-semibold text-white tracking-tight">CapStone</span>
         </div>
         <div className="text-sm text-zinc-500">
           New here?{' '}

@@ -42,7 +42,7 @@ app.use(requestLogger);
 // ─── Root ─────────────────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.json({
-    name: 'Village API Platform',
+    name: 'CapStone',
     version: '1.0.0',
     status: 'running',
     endpoints: {
@@ -113,7 +113,7 @@ app.use((err, req, res, next) => {
 // ─── Start Server ─────────────────────────────────────────────────────────────
 if (require.main === module) {
   const server = app.listen(env.PORT, () => {
-    logger.info(`🚀 Village API Platform running on port ${env.PORT} [${env.NODE_ENV}]`);
+    logger.info(`🚀 CapStone running on port ${env.PORT} [${env.NODE_ENV}]`);
     logger.info(`📡 API base: http://localhost:${env.PORT}${API}`);
   });
 

@@ -1,4 +1,4 @@
-# Village API Platform
+# CapStone
 
 > India's most complete geographic data API — 600,000+ villages, 766 districts, and 36 states & UTs with sub-100ms cached responses.
 

@@ -210,7 +210,7 @@ export default function B2BDashboard() {
         key: keyId,
         amount,
         currency,
-        name: 'Village API Platform',
+        name: 'CapStone',
         description: planLabel,
         order_id: orderId,
         prefill: { name: user?.name, email: user?.email },

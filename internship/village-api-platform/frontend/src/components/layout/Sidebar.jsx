@@ -79,7 +79,7 @@ export default function Sidebar({ open, onClose }) {
               </svg>
             </div>
             <div>
-              <p className="text-sm font-bold text-gray-100 leading-none">Village API Platform</p>
+              <p className="text-sm font-bold text-gray-100 leading-none">CapStone</p>
               <p className="text-xs text-gray-500 mt-0.5">{isAdmin ? 'Admin Panel' : 'Client Portal'}</p>
             </div>
           </div>

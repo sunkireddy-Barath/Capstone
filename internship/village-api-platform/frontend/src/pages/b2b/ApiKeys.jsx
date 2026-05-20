@@ -186,7 +186,7 @@ export default function ApiKeys() {
             </svg>
           </div>
           <h3 className="text-base font-semibold text-gray-300 mb-2">No API keys yet</h3>
-          <p className="text-sm text-gray-500 mb-6">Create your first API key to start accessing the Village API</p>
+          <p className="text-sm text-gray-500 mb-6">Create your first API key to start accessing CapStone</p>
           <Button onClick={() => setCreateOpen(true)}>Create API Key</Button>
         </div>
       ) : (

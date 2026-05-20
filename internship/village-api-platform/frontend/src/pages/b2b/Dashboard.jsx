@@ -1,12 +1,81 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router-dom'; // still used for analytics/api-keys links below
 import { b2bApi } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import Layout, { PageHeader } from '../../components/layout/Layout';
 import { RequestsAreaChart } from '../../components/charts/UsageChart';
 import { PlanBadge, HttpStatusBadge } from '../../components/ui/Badge';
 import { SkeletonStatGrid } from '../../components/ui/Skeleton';
+import { useToast } from '../../components/ui/Toast';
 import { formatNumber, formatDateTime } from '../../utils/helpers';
+
+const PLANS = [
+  { key: 'FREE',      label: 'Free',      limit: '1,000',   subtext: 'req / day', color: 'border-gray-700 hover:border-gray-600',    badge: 'text-gray-400', highlight: false },
+  { key: 'PREMIUM',   label: 'Premium',   limit: '10,000',  subtext: 'req / day', color: 'border-blue-500/40 hover:border-blue-500',  badge: 'text-blue-400',   highlight: false },
+  { key: 'PRO',       label: 'Pro',       limit: '100,000', subtext: 'req / day', color: 'border-brand-500/40 hover:border-brand-500',badge: 'text-brand-400',  highlight: true  },
+  { key: 'UNLIMITED', label: 'Unlimited', limit: '∞',       subtext: 'no limits', color: 'border-amber-500/40 hover:border-amber-500',badge: 'text-amber-400',  highlight: false },
+];
+
+function UpgradeModal({ open, onClose, currentPlan, onUpgrade, upgrading }) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg shadow-2xl p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h2 className="text-lg font-bold text-gray-100">Upgrade your plan</h2>
+            <p className="text-xs text-gray-500 mt-0.5">Select a plan to change your daily API limits</p>
+          </div>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 transition-colors p-1">
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          {PLANS.map((plan) => {
+            const isCurrent = plan.key === currentPlan;
+            return (
+              <button
+                key={plan.key}
+                disabled={isCurrent || upgrading}
+                onClick={() => onUpgrade(plan.key)}
+                className={`relative text-left rounded-xl border p-4 transition-all duration-150 ${plan.color} ${
+                  isCurrent
+                    ? 'opacity-60 cursor-not-allowed bg-gray-800/40'
+                    : 'cursor-pointer bg-gray-800/20 hover:bg-gray-800/50 active:scale-[0.98]'
+                }`}
+              >
+                {isCurrent && (
+                  <span className="absolute top-2.5 right-2.5 text-[10px] font-semibold text-gray-400 bg-gray-700 px-2 py-0.5 rounded-full">
+                    Current
+                  </span>
+                )}
+                {plan.highlight && !isCurrent && (
+                  <span className="absolute top-2.5 right-2.5 text-[10px] font-semibold text-brand-400 bg-brand-500/10 border border-brand-500/30 px-2 py-0.5 rounded-full">
+                    Popular
+                  </span>
+                )}
+                <p className={`text-sm font-bold mb-1 ${plan.badge}`}>{plan.label}</p>
+                <p className="text-xl font-black text-gray-100">{plan.limit}</p>
+                <p className="text-xs text-gray-500">{plan.subtext}</p>
+              </button>
+            );
+          })}
+        </div>
+
+        {upgrading && (
+          <div className="flex items-center justify-center gap-2 py-2 text-sm text-gray-400">
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-600 border-t-brand-400" />
+            Upgrading your plan…
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 const planLimits = { FREE: '1,000', PREMIUM: '10,000', PRO: '100,000', UNLIMITED: '∞' };
 const planColors = { FREE: 'text-gray-400', PREMIUM: 'text-blue-400', PRO: 'text-purple-400', UNLIMITED: 'text-amber-400' };
@@ -63,15 +132,38 @@ function UsageBar({ used, limit }) {
 
 export default function B2BDashboard() {
   const user = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [upgradeOpen, setUpgradeOpen] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
+  const toast = useToast();
 
-  useEffect(() => {
+  const loadDashboard = () => {
+    setLoading(true);
     b2bApi.getDashboard()
       .then((r) => setData(r.data.data))
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { loadDashboard(); }, []);
+
+  const handleUpgrade = async (planType) => {
+    if (planType === user?.planType) return;
+    setUpgrading(true);
+    try {
+      const res = await b2bApi.upgradePlan(planType);
+      setUser(res.data.data);
+      setUpgradeOpen(false);
+      toast.success(`Plan upgraded to ${planType}!`);
+      loadDashboard();
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Upgrade failed. Try again.');
+    } finally {
+      setUpgrading(false);
+    }
+  };
 
   const dailyLimit = { FREE: 1000, PREMIUM: 10000, PRO: 100000, UNLIMITED: 999999999 }[user?.planType] || 1000;
   const todayUsage = data?.dailyUsage?.[data.dailyUsage.length - 1]?.requests || 0;
@@ -84,11 +176,12 @@ export default function B2BDashboard() {
         actions={
           <div className="flex items-center gap-3">
             <PlanBadge plan={user?.planType || 'FREE'} />
-            {user?.planType === 'FREE' && (
-              <Link to="/dashboard/api-keys" className="btn-primary text-xs py-1.5 px-3">
-                Upgrade Plan
-              </Link>
-            )}
+            <button
+              onClick={() => setUpgradeOpen(true)}
+              className="btn-primary text-xs py-1.5 px-3"
+            >
+              {user?.planType === 'FREE' ? 'Upgrade Plan' : 'Change Plan'}
+            </button>
           </div>
         }
       />
@@ -211,6 +304,14 @@ export default function B2BDashboard() {
           </div>
         </>
       )}
+
+      <UpgradeModal
+        open={upgradeOpen}
+        onClose={() => setUpgradeOpen(false)}
+        currentPlan={user?.planType || 'FREE'}
+        onUpgrade={handleUpgrade}
+        upgrading={upgrading}
+      />
     </Layout>
   );
 }

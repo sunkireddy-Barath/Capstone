@@ -52,64 +52,64 @@ The Village API Platform provides structured, hierarchical access to India's com
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              CLIENT BROWSER                                  │
-│                    https://frontend-virid-ten-21.vercel.app                  │
-└───────────────────────────────────┬─────────────────────────────────────────┘
-                                    │  HTTPS
-                                    ▼
+│                                CLIENT BROWSER                               │
+│                   https://frontend-virid-ten-21.vercel.app                  │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │  HTTPS
+                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                         VERCEL EDGE NETWORK (CDN)                            │
-│                      Static Assets  +  SPA Rewrite Rule                      │
-│                     (React build served from /dist)                           │
-└───────────────────────────────────┬─────────────────────────────────────────┘
-                                    │  API calls via VITE_API_URL
-                                    ▼
+│                          VERCEL EDGE NETWORK (CDN)                          │
+│                      Static Assets  +  SPA Rewrite Rule                     │
+│                       (React build served from /dist)                       │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │  API calls via VITE_API_URL
+                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       VERCEL SERVERLESS FUNCTIONS                             │
-│               https://backend-theta-two-68.vercel.app                        │
-│                                                                               │
-│   ┌───────────────────────────────────────────────────────────────────────┐  │
-│   │                      Express.js Application                           │  │
-│   │                                                                       │  │
-│   │  ┌─────────────┐  ┌──────────────┐  ┌────────────┐  ┌─────────────┐ │  │
-│   │  │  Auth        │  │  Geography   │  │   Search   │  │   Admin     │ │  │
-│   │  │  Routes      │  │  Routes      │  │   Routes   │  │   Routes    │ │  │
-│   │  │  /api/auth   │  │  /api/v1     │  │ /api/v1/   │  │ /api/admin  │ │  │
-│   │  └──────┬───────┘  └──────┬───────┘  └─────┬──────┘  └──────┬──────┘ │  │
-│   │         │                 │                 │                │        │  │
-│   │         └─────────────────┴─────────────────┴────────────────┘        │  │
-│   │                                    │                                   │  │
-│   │                    ┌───────────────▼──────────────┐                   │  │
-│   │                    │     Middleware Pipeline        │                  │  │
-│   │                    │  Helmet → CORS → Rate Limit   │                  │  │
-│   │                    │  → API Key Auth → Validate    │                  │  │
-│   │                    └───────────────┬───────────────┘                  │  │
-│   │                                    │                                   │  │
-│   │              ┌─────────────────────┴─────────────────────┐            │  │
-│   │              │                                           │            │  │
-│   │   ┌──────────▼──────────┐                   ┌───────────▼─────────┐  │  │
-│   │   │   Prisma ORM Client │                   │   Cache Service     │  │  │
-│   │   │   (PostgreSQL)      │                   │   (Upstash Redis)   │  │  │
-│   │   └──────────┬──────────┘                   └───────────┬─────────┘  │  │
-│   └──────────────┼──────────────────────────────────────────┼────────────┘  │
-└──────────────────┼──────────────────────────────────────────┼───────────────┘
-                   │                                          │
-                   ▼                                          ▼
-  ┌─────────────────────────────┐           ┌─────────────────────────────────┐
-  │       NeonDB (PostgreSQL)    │           │       Upstash (Redis)            │
-  │  ap-southeast-1 (Singapore) │           │     REST API  ·  Global Edge     │
-  │                              │           │                                  │
-  │  Tables:                     │           │  Cache Keys:                     │
-  │  • countries                 │           │  • states:{page}                 │
-  │  • states (36)               │           │  • districts:{state}:{page}      │
-  │  • districts (766)           │           │  • villages:{subDistrict}:{page} │
-  │  • sub_districts             │           │  • search:{query}                │
-  │  • villages (600K+)          │           │  • apikey:{key}  (24h TTL)       │
-  │  • users                     │           │  • ratelimit:{key}:{date}        │
-  │  • api_keys                  │           │                                  │
-  │  • api_logs                  │           └─────────────────────────────────┘
-  │  • user_state_access         │
-  └─────────────────────────────┘
+│                         VERCEL SERVERLESS FUNCTIONS                         │
+│                   https://backend-theta-two-68.vercel.app                   │
+│                                                                             │
+│   ┌─────────────────────────────────────────────────────────────────────┐   │
+│   │                        Express.js Application                       │   │
+│   │                                                                     │   │
+│   │ ┌─────────────┐  ┌─────────────┐   ┌─────────────┐  ┌─────────────┐ │   │
+│   │ │    Auth     │  │  Geography  │   │   Search    │  │    Admin    │ │   │
+│   │ │   Routes    │  │   Routes    │   │   Routes    │  │   Routes    │ │   │
+│   │ │  /api/auth  │  │   /api/v1   │   │  /api/v1/   │  │ /api/admin  │ │   │
+│   │ └──────┬──────┘  └──────┬──────┘   └──────┬──────┘  └──────┬──────┘ │   │
+│   │        │                │                 │                │        │   │
+│   │        └────────────────┴────────┬────────┴────────────────┘        │   │
+│   │                                  │                                  │   │
+│   │                  ┌───────────────▼───────────────┐                  │   │
+│   │                  │      Middleware Pipeline      │                  │   │
+│   │                  │  Helmet → CORS → Rate Limit   │                  │   │
+│   │                  │  → API Key Auth → Validate    │                  │   │
+│   │                  └───────────────┬───────────────┘                  │   │
+│   │                                  │                                  │   │
+│   │             ┌────────────────────┴────────────────────┐             │   │
+│   │             │                                         │             │   │
+│   │  ┌──────────▼──────────┐                   ┌──────────▼──────────┐  │   │
+│   │  │  Prisma ORM Client  │                   │    Cache Service    │  │   │
+│   │  │    (PostgreSQL)     │                   │   (Upstash Redis)   │  │   │
+│   │  └──────────┬──────────┘                   └──────────┬──────────┘  │   │
+│   └─────────────┼─────────────────────────────────────────┼─────────────┘   │
+└─────────────────┼─────────────────────────────────────────┼─────────────────┘
+                  │                                         │                  
+                  ▼                                         ▼                  
+  ┌───────────────────────────────┐         ┌───────────────────────────────┐  
+  │      NeonDB (PostgreSQL)      │         │        Upstash (Redis)        │  
+  │  ap-southeast-1 (Singapore)   │         │   REST API  ·  Global Edge    │  
+  │                               │         │                               │  
+  │ Tables:                       │         │ Cache Keys:                   │  
+  │ • countries                   │         │ • states:{page}               │  
+  │ • states (36)                 │         │ • districts:{state}:{page}    │  
+  │ • districts (766)             │         │ • villages:{subDist}:{page}   │  
+  │ • sub_districts               │         │ • search:{query}              │  
+  │ • villages (600K+)            │         │ • apikey:{key} (24h TTL)      │  
+  │ • users                       │         │ • ratelimit:{key}:{date}      │  
+  │ • api_keys                    │         │                               │  
+  │ • api_logs                    │         └───────────────────────────────┘  
+  │ • user_state_access           │                                            
+  └───────────────────────────────┘                                            
 ```
 
 ### Request Flow — Geography API Call
@@ -671,8 +671,8 @@ node prisma/seed.js          # admin user
 
 ```
 countries ──< states ──< districts ──< sub_districts ──< villages
-                │
-                └──< user_state_access >── users ──< api_keys ──< api_logs
+              │
+              └──< user_state_access >── users ──< api_keys ──< api_logs
 ```
 
 | Table | Rows (approx) | Key columns |

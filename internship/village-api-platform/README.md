@@ -16,24 +16,27 @@
 
 ---
 
-## Admin Login Credentials
+## Demo Credentials
+
+### Admin Account
 
 | Field | Value |
 |---|---|
-| **URL** | https://frontend-virid-ten-21.vercel.app/login |
+| **Login URL** | https://frontend-virid-ten-21.vercel.app/login |
 | **Email** | `admin@villageapi.in` |
 | **Password** | `Admin@123456` |
-| **Role** | `ADMIN` — full access to all admin routes |
+| **Role** | `ADMIN` |
+| **Plan** | `PRO` — full system access |
 
-> The admin account has `UNLIMITED` plan and access to all system dashboards, user management, API key management, and request logs.
+Admin access includes: user management, all API keys, request logs, system analytics, cache flush.
 
-**Client (regular user) demo:**
+### Client Account (sign up free)
 
 | Field | Value |
 |---|---|
-| **Email** | Any registered account |
-| **Register at** | https://frontend-virid-ten-21.vercel.app/register |
-| **Plan** | `FREE` — 1,000 API calls/day, upgrade available |
+| **Register URL** | https://frontend-virid-ten-21.vercel.app/register |
+| **Plan** | `FREE` — 1,000 API calls/day |
+| **Upgrade** | Available via dashboard |
 
 ---
 

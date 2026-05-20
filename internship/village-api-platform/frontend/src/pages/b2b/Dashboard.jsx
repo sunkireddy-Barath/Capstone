@@ -10,22 +10,34 @@ import { useToast } from '../../components/ui/Toast';
 import { formatNumber, formatDateTime } from '../../utils/helpers';
 
 const PLANS = [
-  { key: 'FREE',      label: 'Free',      limit: '1,000',   subtext: 'req / day', color: 'border-gray-700 hover:border-gray-600',    badge: 'text-gray-400', highlight: false },
-  { key: 'PREMIUM',   label: 'Premium',   limit: '10,000',  subtext: 'req / day', color: 'border-blue-500/40 hover:border-blue-500',  badge: 'text-blue-400',   highlight: false },
-  { key: 'PRO',       label: 'Pro',       limit: '100,000', subtext: 'req / day', color: 'border-brand-500/40 hover:border-brand-500',badge: 'text-brand-400',  highlight: true  },
-  { key: 'UNLIMITED', label: 'Unlimited', limit: '∞',       subtext: 'no limits', color: 'border-amber-500/40 hover:border-amber-500',badge: 'text-amber-400',  highlight: false },
+  { key: 'FREE',      label: 'Free',      limit: '1,000',   subtext: 'req / day', price: null,     color: 'border-gray-700 hover:border-gray-600',     badge: 'text-gray-400',   highlight: false },
+  { key: 'PREMIUM',   label: 'Premium',   limit: '10,000',  subtext: 'req / day', price: '₹999',   color: 'border-blue-500/40 hover:border-blue-500',   badge: 'text-blue-400',   highlight: false },
+  { key: 'PRO',       label: 'Pro',       limit: '100,000', subtext: 'req / day', price: '₹2,499', color: 'border-brand-500/40 hover:border-brand-500',  badge: 'text-brand-400',  highlight: true  },
+  { key: 'UNLIMITED', label: 'Unlimited', limit: '∞',       subtext: 'no limits', price: '₹4,999', color: 'border-amber-500/40 hover:border-amber-500',  badge: 'text-amber-400',  highlight: false },
 ];
 
-function UpgradeModal({ open, onClose, currentPlan, onUpgrade, upgrading }) {
+function loadRazorpayScript() {
+  return new Promise((resolve) => {
+    if (document.getElementById('razorpay-script')) { resolve(true); return; }
+    const script = document.createElement('script');
+    script.id = 'razorpay-script';
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
+function UpgradeModal({ open, onClose, currentPlan, onUpgradeFree, onUpgradePaid, upgrading }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg shadow-2xl p-6">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-2">
           <div>
-            <h2 className="text-lg font-bold text-gray-100">Upgrade your plan</h2>
-            <p className="text-xs text-gray-500 mt-0.5">Select a plan to change your daily API limits</p>
+            <h2 className="text-lg font-bold text-gray-100">Choose your plan</h2>
+            <p className="text-xs text-gray-500 mt-0.5">Paid plans use Razorpay secure checkout</p>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-300 transition-colors p-1">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -34,17 +46,19 @@ function UpgradeModal({ open, onClose, currentPlan, onUpgrade, upgrading }) {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-2 gap-3 my-5">
           {PLANS.map((plan) => {
             const isCurrent = plan.key === currentPlan;
+            const isPaid = !!plan.price;
+            const handleClick = () => isPaid ? onUpgradePaid(plan.key) : onUpgradeFree(plan.key);
             return (
               <button
                 key={plan.key}
                 disabled={isCurrent || upgrading}
-                onClick={() => onUpgrade(plan.key)}
+                onClick={handleClick}
                 className={`relative text-left rounded-xl border p-4 transition-all duration-150 ${plan.color} ${
                   isCurrent
-                    ? 'opacity-60 cursor-not-allowed bg-gray-800/40'
+                    ? 'opacity-50 cursor-not-allowed bg-gray-800/40'
                     : 'cursor-pointer bg-gray-800/20 hover:bg-gray-800/50 active:scale-[0.98]'
                 }`}
               >
@@ -60,7 +74,18 @@ function UpgradeModal({ open, onClose, currentPlan, onUpgrade, upgrading }) {
                 )}
                 <p className={`text-sm font-bold mb-1 ${plan.badge}`}>{plan.label}</p>
                 <p className="text-xl font-black text-gray-100">{plan.limit}</p>
-                <p className="text-xs text-gray-500">{plan.subtext}</p>
+                <p className="text-xs text-gray-500 mb-2">{plan.subtext}</p>
+                {plan.price ? (
+                  <div className="flex items-center gap-1.5 mt-1">
+                    <span className="text-sm font-bold text-gray-200">{plan.price}</span>
+                    <span className="text-xs text-gray-600">/mo</span>
+                    <svg className="h-3.5 w-3.5 text-blue-400 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                  </div>
+                ) : (
+                  <span className="text-xs text-gray-600">No payment needed</span>
+                )}
               </button>
             );
           })}
@@ -69,9 +94,13 @@ function UpgradeModal({ open, onClose, currentPlan, onUpgrade, upgrading }) {
         {upgrading && (
           <div className="flex items-center justify-center gap-2 py-2 text-sm text-gray-400">
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-gray-600 border-t-brand-400" />
-            Upgrading your plan…
+            Processing…
           </div>
         )}
+
+        <p className="text-center text-xs text-gray-600 mt-1">
+          Paid plans open Razorpay secure checkout · All prices in INR
+        </p>
       </div>
     </div>
   );
@@ -149,19 +178,73 @@ export default function B2BDashboard() {
 
   useEffect(() => { loadDashboard(); }, []);
 
-  const handleUpgrade = async (planType) => {
+  // FREE plan — direct API call, no payment
+  const handleUpgradeFree = async (planType) => {
     if (planType === user?.planType) return;
     setUpgrading(true);
     try {
       const res = await b2bApi.upgradePlan(planType);
       setUser(res.data.data);
       setUpgradeOpen(false);
-      toast.success(`Plan upgraded to ${planType}!`);
+      toast.success('Switched to Free plan.');
       loadDashboard();
     } catch (err) {
-      toast.error(err.response?.data?.error?.message || 'Upgrade failed. Try again.');
+      toast.error(err.response?.data?.error?.message || 'Plan change failed.');
     } finally {
       setUpgrading(false);
+    }
+  };
+
+  // PREMIUM / PRO / UNLIMITED — Razorpay checkout
+  const handleUpgradePaid = async (planType) => {
+    if (planType === user?.planType) return;
+    setUpgrading(true);
+    try {
+      const loaded = await loadRazorpayScript();
+      if (!loaded) { toast.error('Could not load payment gateway. Try again.'); return; }
+
+      const orderRes = await b2bApi.createPaymentOrder(planType);
+      const { orderId, amount, currency, keyId, planLabel } = orderRes.data.data;
+
+      const options = {
+        key: keyId,
+        amount,
+        currency,
+        name: 'Village API Platform',
+        description: planLabel,
+        order_id: orderId,
+        prefill: { name: user?.name, email: user?.email },
+        theme: { color: '#4f46e5' },
+        handler: async (response) => {
+          try {
+            const verifyRes = await b2bApi.verifyPayment({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              planType,
+            });
+            setUser(verifyRes.data.data.user);
+            setUpgradeOpen(false);
+            toast.success(`Upgraded to ${planType} plan!`);
+            loadDashboard();
+          } catch (err) {
+            toast.error(err.response?.data?.error?.message || 'Payment verification failed.');
+          }
+        },
+        modal: { ondismiss: () => setUpgrading(false) },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', () => {
+        toast.error('Payment failed. Please try again.');
+        setUpgrading(false);
+      });
+      rzp.open();
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Could not initiate payment.');
+      setUpgrading(false);
+    } finally {
+      // upgrading stays true until modal closes or payment completes
     }
   };
 
@@ -307,9 +390,10 @@ export default function B2BDashboard() {
 
       <UpgradeModal
         open={upgradeOpen}
-        onClose={() => setUpgradeOpen(false)}
+        onClose={() => { setUpgradeOpen(false); setUpgrading(false); }}
         currentPlan={user?.planType || 'FREE'}
-        onUpgrade={handleUpgrade}
+        onUpgradeFree={handleUpgradeFree}
+        onUpgradePaid={handleUpgradePaid}
         upgrading={upgrading}
       />
     </Layout>

@@ -44,4 +44,7 @@ module.exports = {
   },
 
   IS_PRODUCTION: optional('NODE_ENV', 'development') === 'production',
+
+  RAZORPAY_KEY_ID: optional('RAZORPAY_KEY_ID', ''),
+  RAZORPAY_KEY_SECRET: optional('RAZORPAY_KEY_SECRET', ''),
 };

@@ -56,6 +56,8 @@ export const b2bApi = {
   listApiKeys: () => api.get('/b2b/api-keys'),
   revokeApiKey: (id) => api.delete(`/b2b/api-keys/${id}`),
   upgradePlan: (planType) => api.put('/b2b/plan', { planType }),
+  createPaymentOrder: (planType) => api.post('/b2b/payment/create-order', { planType }),
+  verifyPayment: (data) => api.post('/b2b/payment/verify', data),
 };
 
 // ─── Admin ────────────────────────────────────────────────────────────────────

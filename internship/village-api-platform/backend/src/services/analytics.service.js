@@ -46,7 +46,7 @@ const getUserDashboard = async (userId) => {
     recentLogs,
   ] = await Promise.all([
     analyticsRepo.getRequestsByUser(userId, 9999),
-    analyticsRepo.getRequestsToday(),
+    analyticsRepo.getRequestsTodayByUser(userId),
     analyticsRepo.getDailyUsageByUser(userId, 30),
     analyticsRepo.getRecentLogs(20, userId),
   ]);

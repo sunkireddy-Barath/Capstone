@@ -138,11 +138,18 @@ const getTodayUsageByApiKey = async (apiKeyId) => {
   return prisma.apiLog.count({ where: { apiKeyId, createdAt: { gte: start } } });
 };
 
+const getRequestsTodayByUser = (userId) => {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  return prisma.apiLog.count({ where: { userId, createdAt: { gte: start } } });
+};
+
 module.exports = {
   getTotalRequests,
   getRequestsToday,
   getRequestsByUser,
   getRequestsByApiKey,
+  getRequestsTodayByUser,
   getDailyUsageByUser,
   getDailyUsageSystem,
   getTopEndpoints,

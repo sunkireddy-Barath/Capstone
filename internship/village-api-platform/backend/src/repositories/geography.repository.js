@@ -1,7 +1,5 @@
 const prisma = require('../config/database');
 
-// ─── States ──────────────────────────────────────────────────────────────────
-
 const findAllStates = async ({ skip, limit, orderBy }) => {
   const [data, total] = await prisma.$transaction([
     prisma.state.findMany({
@@ -17,8 +15,6 @@ const findAllStates = async ({ skip, limit, orderBy }) => {
 
 const findStateByCode = async (code) =>
   prisma.state.findUnique({ where: { code }, select: { id: true, code: true, name: true } });
-
-// ─── Districts ────────────────────────────────────────────────────────────────
 
 const findDistrictsByState = async (stateCode, { skip, limit, orderBy }) => {
   const state = await prisma.state.findUnique({ where: { code: stateCode }, select: { id: true } });
@@ -43,8 +39,6 @@ const findDistrictByCode = async (code, stateId) =>
     select: { id: true, code: true, name: true },
   });
 
-// ─── SubDistricts ─────────────────────────────────────────────────────────────
-
 const findSubDistrictsByDistrict = async (stateCode, districtCode, { skip, limit, orderBy }) => {
   const state = await prisma.state.findUnique({ where: { code: stateCode }, select: { id: true } });
   if (!state) return null;
@@ -66,8 +60,6 @@ const findSubDistrictsByDistrict = async (stateCode, districtCode, { skip, limit
   ]);
   return { data, total, districtId: district.id };
 };
-
-// ─── Villages ─────────────────────────────────────────────────────────────────
 
 const findVillagesBySubDistrict = async (
   stateCode,
@@ -100,8 +92,6 @@ const findVillagesBySubDistrict = async (
   ]);
   return { data, total, subDistrictId: subDistrict.id };
 };
-
-// ─── Search ───────────────────────────────────────────────────────────────────
 
 const searchVillages = async (query, filters, { skip, limit }) => {
   const where = {
@@ -180,7 +170,6 @@ const searchVillagesByStateCode = async (query, stateCode, { skip, limit }) => {
   return { data, total };
 };
 
-// Autocomplete: fast, limited result set
 const autocompleteVillages = async (query, stateCode, limit = 10) => {
   const where = stateCode
     ? {

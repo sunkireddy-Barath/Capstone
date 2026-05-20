@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Layout, { PageHeader } from '../../components/layout/Layout';
 
-const BASE_URL = 'https://api.villageapi.in';
+const BASE_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
 const endpoints = [
   {
@@ -115,11 +115,10 @@ const endpoints = [
         ],
         response: `{
   "success": true,
-  "data": [
-    "Mumbai",
-    "Mumbra",
-    "Murbad"
-  ]
+  "data": {
+    "suggestions": ["Mumbai", "Mumbra", "Murbad"],
+    "count": 3
+  }
 }`,
       },
     ],
@@ -207,14 +206,12 @@ function EndpointCard({ endpoint }) {
         <div className="mt-4 pt-4 border-t border-gray-800 space-y-4 animate-fade-in">
           <p className="text-sm text-gray-400">{endpoint.description}</p>
 
-          {/* Auth header note */}
           <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg px-4 py-3 text-xs text-amber-300">
             <span className="font-semibold">Authentication:</span> Geography & Search endpoints require{' '}
             <code className="bg-gray-800 px-1.5 py-0.5 rounded font-mono">X-API-Key</code> and{' '}
             <code className="bg-gray-800 px-1.5 py-0.5 rounded font-mono">X-API-Secret</code> headers.
           </div>
 
-          {/* Parameters */}
           <div>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Parameters</p>
             <div className="overflow-x-auto rounded-lg border border-gray-800">
@@ -241,7 +238,6 @@ function EndpointCard({ endpoint }) {
             </div>
           </div>
 
-          {/* Example response */}
           <div>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Example Response</p>
             <pre className="bg-gray-950 border border-gray-800 rounded-lg p-4 text-xs text-gray-300 overflow-x-auto font-mono leading-relaxed">
@@ -249,7 +245,6 @@ function EndpointCard({ endpoint }) {
             </pre>
           </div>
 
-          {/* curl example */}
           <div>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">cURL Example</p>
             <pre className="bg-gray-950 border border-gray-800 rounded-lg p-4 text-xs text-gray-400 overflow-x-auto font-mono">
@@ -277,7 +272,7 @@ export default function ApiExplorer() {
         subtitle="Complete documentation for all endpoints"
         actions={
           <a
-            href="https://docs.villageapi.in"
+            href="https://github.com/Sunkireddy_Barath/Capstone"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-secondary text-sm flex items-center gap-2"
@@ -285,12 +280,11 @@ export default function ApiExplorer() {
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
-            Full Docs
+            GitHub
           </a>
         }
       />
 
-      {/* Base URL + Auth info */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
         <div className="card-sm">
           <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-2">Base URL</p>
@@ -305,7 +299,6 @@ export default function ApiExplorer() {
         </div>
       </div>
 
-      {/* Rate limits */}
       <div className="card mb-8">
         <p className="text-sm font-semibold text-gray-300 mb-4">Rate Limits by Plan</p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -323,7 +316,6 @@ export default function ApiExplorer() {
         </div>
       </div>
 
-      {/* Filter tabs */}
       <div className="flex gap-2 mb-6 flex-wrap">
         {groups.map((g) => (
           <button
@@ -340,7 +332,6 @@ export default function ApiExplorer() {
         ))}
       </div>
 
-      {/* Endpoints */}
       <div className="space-y-6">
         {filtered.map((group) => (
           <div key={group.group}>

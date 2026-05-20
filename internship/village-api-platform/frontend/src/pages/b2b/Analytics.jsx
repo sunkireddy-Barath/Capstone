@@ -4,18 +4,22 @@ import Layout, { PageHeader } from '../../components/layout/Layout';
 import { RequestsAreaChart, ResponseTimeChart } from '../../components/charts/UsageChart';
 import { PageLoader } from '../../components/ui/Spinner';
 import Button from '../../components/ui/Button';
+import { useToast } from '../../components/ui/Toast';
 
 export default function B2BAnalytics() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [days, setDays] = useState(30);
+  const toast = useToast();
 
   const load = async (d = days) => {
     setLoading(true);
     try {
       const res = await b2bApi.getAnalytics(d);
       setData(res.data.data);
-    } catch {}
+    } catch {
+      toast.error('Failed to load analytics data.');
+    }
     finally { setLoading(false); }
   };
 
@@ -55,7 +59,6 @@ export default function B2BAnalytics() {
         </div>
       </div>
 
-      {/* Summary table */}
       <div className="card mt-6">
         <h3 className="text-sm font-semibold text-gray-300 mb-4">Daily Breakdown</h3>
         <div className="overflow-x-auto">

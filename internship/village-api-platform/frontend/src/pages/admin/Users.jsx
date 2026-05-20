@@ -7,6 +7,7 @@ import Modal from '../../components/ui/Modal';
 import Button from '../../components/ui/Button';
 import { Select } from '../../components/ui/Input';
 import { formatDate, formatNumber } from '../../utils/helpers';
+import { useToast } from '../../components/ui/Toast';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);
@@ -15,6 +16,7 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(true);
   const [editUser, setEditUser] = useState(null);
   const [saving, setSaving] = useState(false);
+  const toast = useToast();
 
   const load = async (p = page) => {
     setLoading(true);
@@ -38,7 +40,9 @@ export default function AdminUsers() {
       });
       setEditUser(null);
       load();
-    } catch {}
+    } catch (err) {
+      toast.error(err.response?.data?.error?.message || 'Failed to update user.');
+    }
     finally { setSaving(false); }
   };
 

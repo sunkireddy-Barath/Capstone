@@ -68,11 +68,9 @@ export default function Register() {
   return (
     <div className="min-h-screen flex" style={{ background: '#07070c' }}>
 
-      {/* ─── Left panel ─────────────────────────────── */}
       <div className="hidden lg:flex flex-col w-[52%] shrink-0 relative overflow-hidden p-14"
         style={{ background: 'linear-gradient(135deg,#0d0d18 0%,#0a0a14 50%,#07070c 100%)' }}>
 
-        {/* Grain texture */}
         <svg className="absolute inset-0 w-full h-full opacity-[0.18] pointer-events-none" xmlns="http://www.w3.org/2000/svg">
           <filter id="grain-r">
             <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
@@ -81,23 +79,18 @@ export default function Register() {
           <rect width="100%" height="100%" filter="url(#grain-r)" opacity="0.4"/>
         </svg>
 
-        {/* Glow accents */}
         <div className="absolute top-[-80px] right-[-80px] w-[500px] h-[500px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%)' }} />
         <div className="absolute bottom-[-100px] left-[-60px] w-[400px] h-[400px] rounded-full pointer-events-none"
           style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.08) 0%, transparent 70%)' }} />
 
-        {/* Dot grid */}
         <div className="absolute inset-0 opacity-[0.06] pointer-events-none"
           style={{ backgroundImage: 'radial-gradient(circle, #818cf8 1px, transparent 1px)', backgroundSize: '32px 32px' }} />
 
-        {/* Content */}
         <div className="relative z-10 flex flex-col h-full">
 
-          {/* Logo */}
           <Logo />
 
-          {/* Main headline */}
           <div className="flex-1 flex flex-col justify-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/25 bg-violet-500/8 px-3 py-1 mb-8 w-fit">
               <span className="h-1.5 w-1.5 rounded-full bg-violet-400" />
@@ -117,11 +110,10 @@ export default function Register() {
             </p>
           </div>
 
-          {/* Stat cards row */}
           <div className="grid grid-cols-3 gap-3">
             {[
               { n: '1,000', l: 'Free calls/day' },
-              { n: '71+',   l: 'Villages loaded' },
+              { n: '600K+', l: 'Villages loaded' },
               { n: 'Instant', l: 'Key generation' },
             ].map(({ n, l }) => (
               <div key={l} className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-4 py-4 backdrop-blur-sm">
@@ -133,10 +125,8 @@ export default function Register() {
         </div>
       </div>
 
-      {/* ─── Right panel ─────────────────────────────── */}
       <div className="flex-1 flex flex-col min-h-screen">
 
-        {/* Top nav */}
         <nav className="flex items-center justify-between px-10 py-6">
           <div className="lg:hidden"><Logo /></div>
           <div className="lg:ml-auto flex items-center gap-2 text-sm">
@@ -148,11 +138,9 @@ export default function Register() {
           </div>
         </nav>
 
-        {/* Form */}
         <div className="flex-1 flex items-center justify-center px-6 pb-16">
           <div className="w-full max-w-[400px]">
 
-            {/* Heading */}
             <div className="mb-8">
               <h2 className="text-[1.75rem] font-bold tracking-tight text-white mb-2">
                 Create your account
@@ -162,7 +150,6 @@ export default function Register() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
 
-              {/* Error */}
               {error && (
                 <div className="flex items-start gap-2.5 rounded-xl border border-red-900/50 bg-red-950/20 px-4 py-3 text-sm text-red-400">
                   <svg className="mt-0.5 h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -172,7 +159,6 @@ export default function Register() {
                 </div>
               )}
 
-              {/* Name + Company */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-widest">
@@ -197,7 +183,6 @@ export default function Register() {
                 </div>
               </div>
 
-              {/* Email */}
               <div className="space-y-2">
                 <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-widest">
                   Email <span className="text-indigo-500 normal-case tracking-normal">*</span>
@@ -213,7 +198,6 @@ export default function Register() {
                 />
               </div>
 
-              {/* Password */}
               <div className="space-y-2">
                 <label className="block text-xs font-semibold text-zinc-400 uppercase tracking-widest">
                   Password <span className="text-indigo-500 normal-case tracking-normal">*</span>
@@ -244,7 +228,6 @@ export default function Register() {
                   </button>
                 </div>
 
-                {/* Strength meter */}
                 {form.password && strength > 0 && (
                   <div className="space-y-1.5">
                     <div className="flex gap-1">
@@ -261,7 +244,6 @@ export default function Register() {
                 )}
               </div>
 
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
@@ -280,7 +262,6 @@ export default function Register() {
               </p>
             </form>
 
-            {/* Footer */}
             <div className="mt-8 flex items-center gap-4">
               <div className="h-px flex-1 bg-zinc-800" />
               <span className="text-xs text-zinc-700">or</span>

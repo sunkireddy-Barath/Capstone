@@ -6,8 +6,6 @@ const { parsePagination, parseSorting } = require('../utils/pagination');
 const { success, paginated } = require('../utils/response');
 const { NotFoundError } = require('../utils/errors');
 
-// ─── Users ────────────────────────────────────────────────────────────────────
-
 const getUsers = async (req, res) => {
   const { page, limit, skip } = parsePagination(req.query);
   const orderBy = parseSorting(req.query, ['name', 'email', 'createdAt', 'planType']);
@@ -38,11 +36,9 @@ const updateUser = async (req, res) => {
   return success(res, updated);
 };
 
-// ─── API Keys ─────────────────────────────────────────────────────────────────
-
 const getAllApiKeys = async (req, res) => {
   const { page, limit, skip } = parsePagination(req.query);
-  const { data, total } = await apiKeyRepo.findAll({ skip, limit });
+  const { data, total } = await apiKeyRepo.findAll({ skip, limit, search: req.query.search });
   return paginated(res, data, page, limit, total);
 };
 
@@ -51,8 +47,6 @@ const createApiKeyForUser = async (req, res) => {
   const result = await apiKeyService.createApiKey(userId, req.body);
   return success(res, result, null, 201);
 };
-
-// ─── Analytics ────────────────────────────────────────────────────────────────
 
 const getSystemStats = async (req, res) => {
   const stats = await analyticsService.getSystemStats();
@@ -71,14 +65,13 @@ const getTopEndpoints = async (req, res) => {
   return success(res, data);
 };
 
-// ─── Logs ─────────────────────────────────────────────────────────────────────
-
 const getLogs = async (req, res) => {
   const { page, limit, skip } = parsePagination(req.query);
   const filters = {
     userId: req.query.userId,
     apiKeyId: req.query.apiKeyId,
     statusCode: req.query.statusCode,
+    statusClass: req.query.statusClass,
     from: req.query.from,
     to: req.query.to,
   };
@@ -86,20 +79,11 @@ const getLogs = async (req, res) => {
   return paginated(res, data, page, limit, total);
 };
 
-// ─── Cache Management ─────────────────────────────────────────────────────────
-
 const flushGeographyCache = async (req, res) => {
-  const redis = require('../config/redis');
+  const cache = require('../services/cache.service');
   const prefixes = ['states:', 'districts:', 'subdistricts:', 'villages:', 'search:', 'autocomplete:'];
-  let flushed = 0;
-  for (const prefix of prefixes) {
-    const keys = await redis.keys(`${prefix}*`);
-    if (keys.length > 0) {
-      await Promise.all(keys.map((k) => redis.del(k)));
-      flushed += keys.length;
-    }
-  }
-  return success(res, { message: `Flushed ${flushed} cache keys`, flushed });
+  await Promise.all(prefixes.map((prefix) => cache.invalidatePattern(prefix)));
+  return success(res, { message: 'Geography cache flushed' });
 };
 
 module.exports = {

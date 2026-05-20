@@ -24,8 +24,6 @@ const formatVillageAddress = (village) => {
   };
 };
 
-// ─── States ──────────────────────────────────────────────────────────────────
-
 const getStates = async (query) => {
   const { page, limit, skip } = parsePagination(query);
   const orderBy = parseSorting(query, SORT_FIELDS);
@@ -40,12 +38,10 @@ const getStates = async (query) => {
   return { result: cached, page, limit, cacheHit };
 };
 
-// ─── Districts ────────────────────────────────────────────────────────────────
-
 const getDistricts = async (stateCode, query) => {
   const { page, limit, skip } = parsePagination(query);
   const orderBy = parseSorting(query, SORT_FIELDS);
-  const cacheKey = `districts:${stateCode}:${page}:${limit}`;
+  const cacheKey = `districts:${stateCode}:${page}:${limit}:${JSON.stringify(orderBy)}`;
 
   const { data: cached, cacheHit } = await cache.wrap(
     cacheKey,
@@ -60,12 +56,10 @@ const getDistricts = async (stateCode, query) => {
   return { result: cached, page, limit, cacheHit };
 };
 
-// ─── SubDistricts ─────────────────────────────────────────────────────────────
-
 const getSubDistricts = async (stateCode, districtCode, query) => {
   const { page, limit, skip } = parsePagination(query);
   const orderBy = parseSorting(query, SORT_FIELDS);
-  const cacheKey = `subdistricts:${stateCode}:${districtCode}:${page}:${limit}`;
+  const cacheKey = `subdistricts:${stateCode}:${districtCode}:${page}:${limit}:${JSON.stringify(orderBy)}`;
 
   const { data: cached, cacheHit } = await cache.wrap(
     cacheKey,
@@ -80,12 +74,10 @@ const getSubDistricts = async (stateCode, districtCode, query) => {
   return { result: cached, page, limit, cacheHit };
 };
 
-// ─── Villages ─────────────────────────────────────────────────────────────────
-
 const getVillages = async (stateCode, districtCode, subDistrictCode, query) => {
   const { page, limit, skip } = parsePagination(query);
   const orderBy = parseSorting(query, SORT_FIELDS);
-  const cacheKey = `villages:${stateCode}:${districtCode}:${subDistrictCode}:${page}:${limit}`;
+  const cacheKey = `villages:${stateCode}:${districtCode}:${subDistrictCode}:${page}:${limit}:${JSON.stringify(orderBy)}`;
 
   const { data: cached, cacheHit } = await cache.wrap(
     cacheKey,

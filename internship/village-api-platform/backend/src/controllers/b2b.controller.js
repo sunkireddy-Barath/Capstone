@@ -24,8 +24,8 @@ const getDashboard = async (req, res) => {
 
 const getAnalytics = async (req, res) => {
   const days = Math.min(parseInt(req.query.days, 10) || 30, 90);
-  const data = await analyticsService.getUserDashboard(req.user.id);
-  return success(res, { dailyUsage: data.dailyUsage, recentLogs: data.recentLogs });
+  const data = await analyticsService.getUserAnalytics(req.user.id, days);
+  return success(res, data);
 };
 
 const upgradePlan = async (req, res) => {

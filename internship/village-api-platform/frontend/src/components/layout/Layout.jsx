@@ -8,9 +8,7 @@ export default function Layout({ children }) {
     <div className="flex min-h-screen bg-gray-950">
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main content */}
       <main className="flex-1 lg:ml-64 min-h-screen flex flex-col">
-        {/* Mobile topbar */}
         <div className="lg:hidden flex items-center gap-3 px-4 py-3 border-b border-gray-800 bg-gray-900 sticky top-0 z-20">
           <button
             onClick={() => setSidebarOpen(true)}

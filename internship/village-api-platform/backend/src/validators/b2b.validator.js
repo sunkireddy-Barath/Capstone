@@ -6,8 +6,8 @@ const createApiKeyRules = [
 
 const upgradePlanRules = [
   body('planType')
-    .isIn(['FREE', 'PREMIUM', 'PRO', 'UNLIMITED'])
-    .withMessage('Invalid plan type'),
+    .isIn(['FREE'])
+    .withMessage('Direct plan change only allowed for FREE. Use the payment flow for paid plans.'),
 ];
 
 const apiKeyIdParam = [

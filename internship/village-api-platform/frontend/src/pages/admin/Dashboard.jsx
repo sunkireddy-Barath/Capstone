@@ -89,7 +89,6 @@ export default function AdminDashboard() {
         <SkeletonStatGrid count={4} />
       ) : (
         <>
-          {/* Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <StatCard
               label="Total Users"
@@ -121,7 +120,6 @@ export default function AdminDashboard() {
             />
           </div>
 
-          {/* Health indicators */}
           <div className="grid grid-cols-3 gap-4 mb-8">
             {[
               { label: 'Error Rate', value: `${errorRate}%`, status: errorRate < 5 ? 'good' : errorRate < 15 ? 'warn' : 'bad' },
@@ -138,7 +136,6 @@ export default function AdminDashboard() {
             ))}
           </div>
 
-          {/* Charts row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
             <div className="lg:col-span-2 card">
               <h3 className="text-sm font-semibold text-gray-300 mb-4">Daily Requests (30 days)</h3>
@@ -158,7 +155,6 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Top endpoints */}
           {endpoints.length > 0 && (
             <div className="card mb-8">
               <h3 className="text-sm font-semibold text-gray-300 mb-4">Top Endpoints</h3>
@@ -189,7 +185,6 @@ export default function AdminDashboard() {
             </div>
           )}
 
-          {/* Recent Logs */}
           <div className="card">
             <h3 className="text-sm font-semibold text-gray-300 mb-4">Recent API Requests</h3>
             <div className="overflow-x-auto">

@@ -17,8 +17,6 @@ const hashPassword = async (password) => bcrypt.hash(password, env.BCRYPT_ROUNDS
 
 const verifyPassword = async (password, hash) => bcrypt.compare(password, hash);
 
-const generateRefreshToken = () => crypto.randomBytes(40).toString('hex');
-
 module.exports = {
   generateApiKey,
   generateApiSecret,
@@ -26,5 +24,4 @@ module.exports = {
   verifySecret,
   hashPassword,
   verifyPassword,
-  generateRefreshToken,
 };

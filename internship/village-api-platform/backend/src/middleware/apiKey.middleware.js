@@ -11,7 +11,6 @@ const validateApiKey = async (req, res, next) => {
   if (!apiKey) throw new AuthenticationError('X-API-Key header required');
   if (!apiSecret) throw new AuthenticationError('X-API-Secret header required');
 
-  // Check key from Redis cache first
   const cacheKey = `apikey:${apiKey}`;
   let keyData = await redis.get(cacheKey);
 
@@ -44,29 +43,23 @@ const validateApiKey = async (req, res, next) => {
   const isValidSecret = await verifySecret(apiSecret, keyData.secretHash);
   if (!isValidSecret) throw new AuthenticationError('Invalid API secret');
 
-  // Rate limiting via Redis
   const today = new Date().toISOString().slice(0, 10);
   const rateLimitKey = `ratelimit:${keyData.id}:${today}`;
-
-  const currentCount = (await redis.get(rateLimitKey)) || 0;
   const limit = env.DAILY_LIMITS[keyData.planType] || env.DAILY_LIMITS.FREE;
 
-  if (Number(currentCount) >= limit) {
+  const newCount = await redis.incr(rateLimitKey);
+  if (newCount === 1) {
+    await redis.expire(rateLimitKey, 86400);
+  }
+
+  if (newCount > limit) {
     throw new RateLimitError(
       `Daily limit of ${limit} requests exceeded. Upgrade your plan for more requests.`
     );
   }
 
-  // Increment usage atomically
-  await redis.incr(rateLimitKey);
-  // Set expiry only on first request of the day
-  if (Number(currentCount) === 0) {
-    await redis.expire(rateLimitKey, 86400);
-  }
+  req.apiKeyData = { ...keyData, usageToday: newCount };
 
-  req.apiKeyData = { ...keyData, usageToday: Number(currentCount) + 1 };
-
-  // Update lastUsedAt asynchronously (fire-and-forget)
   prisma.apiKey
     .update({ where: { id: keyData.id }, data: { lastUsedAt: new Date() } })
     .catch(() => {});

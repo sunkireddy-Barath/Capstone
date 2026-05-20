@@ -63,7 +63,6 @@ const verifyAndUpgrade = async (req, res) => {
     throw new ValidationError('Invalid plan type');
   }
 
-  // Verify Razorpay signature
   const expectedSignature = crypto
     .createHmac('sha256', env.RAZORPAY_KEY_SECRET)
     .update(`${razorpay_order_id}|${razorpay_payment_id}`)
@@ -73,7 +72,6 @@ const verifyAndUpgrade = async (req, res) => {
     throw new ValidationError('Payment verification failed. Invalid signature.');
   }
 
-  // Signature valid — upgrade plan
   const user = await apiKeyService.upgradePlan(req.user.id, planType);
 
   return success(res, {

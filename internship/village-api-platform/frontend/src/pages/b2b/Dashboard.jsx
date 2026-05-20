@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom'; // still used for analytics/api-keys links below
+import { Link } from 'react-router-dom';
 import { b2bApi } from '../../services/api';
 import { useAuthStore } from '../../store/authStore';
 import Layout, { PageHeader } from '../../components/layout/Layout';
@@ -172,13 +172,12 @@ export default function B2BDashboard() {
     setLoading(true);
     b2bApi.getDashboard()
       .then((r) => setData(r.data.data))
-      .catch(console.error)
+      .catch(() => toast.error('Failed to load dashboard data.'))
       .finally(() => setLoading(false));
   };
 
   useEffect(() => { loadDashboard(); }, []);
 
-  // FREE plan — direct API call, no payment
   const handleUpgradeFree = async (planType) => {
     if (planType === user?.planType) return;
     setUpgrading(true);
@@ -195,7 +194,6 @@ export default function B2BDashboard() {
     }
   };
 
-  // PREMIUM / PRO / UNLIMITED — Razorpay checkout
   const handleUpgradePaid = async (planType) => {
     if (planType === user?.planType) return;
     setUpgrading(true);
@@ -243,13 +241,11 @@ export default function B2BDashboard() {
     } catch (err) {
       toast.error(err.response?.data?.error?.message || 'Could not initiate payment.');
       setUpgrading(false);
-    } finally {
-      // upgrading stays true until modal closes or payment completes
-    }
+    } finally {}
   };
 
   const dailyLimit = { FREE: 1000, PREMIUM: 10000, PRO: 100000, UNLIMITED: 999999999 }[user?.planType] || 1000;
-  const todayUsage = data?.dailyUsage?.[data.dailyUsage.length - 1]?.requests || 0;
+  const todayUsage = data?.requestsToday || 0;
 
   return (
     <Layout>
@@ -319,7 +315,6 @@ export default function B2BDashboard() {
             </div>
           </div>
 
-          {/* Quick actions */}
           {(!data?.activeApiKeys || data.activeApiKeys === 0) && (
             <div className="card border-dashed border-2 border-gray-700 text-center py-8 mb-8 animate-fade-in">
               <div className="h-12 w-12 bg-brand-500/10 rounded-xl flex items-center justify-center mx-auto mb-4">
@@ -335,7 +330,6 @@ export default function B2BDashboard() {
             </div>
           )}
 
-          {/* Usage Chart */}
           <div className="card mb-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-gray-300">Request History (30 days)</h3>
@@ -352,7 +346,6 @@ export default function B2BDashboard() {
             )}
           </div>
 
-          {/* Recent Logs */}
           <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-sm font-semibold text-gray-300">Recent Requests</h3>

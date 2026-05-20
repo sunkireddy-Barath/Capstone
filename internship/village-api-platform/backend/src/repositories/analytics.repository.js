@@ -103,11 +103,16 @@ const getRecentLogs = (limit = 50, userId = null) => {
   });
 };
 
-const getPaginatedLogs = async ({ skip, limit, userId, apiKeyId, statusCode, from, to }) => {
+const getPaginatedLogs = async ({ skip, limit, userId, apiKeyId, statusCode, statusClass, from, to }) => {
   const where = {};
   if (userId) where.userId = Number(userId);
   if (apiKeyId) where.apiKeyId = Number(apiKeyId);
-  if (statusCode) where.statusCode = Number(statusCode);
+  if (statusClass) {
+    const prefix = parseInt(statusClass[0], 10);
+    where.statusCode = { gte: prefix * 100, lt: (prefix + 1) * 100 };
+  } else if (statusCode) {
+    where.statusCode = Number(statusCode);
+  }
   if (from || to) {
     where.createdAt = {};
     if (from) where.createdAt.gte = new Date(from);

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { adminApi } from '../../services/api';
 import Layout, { PageHeader } from '../../components/layout/Layout';
 import { HttpStatusBadge } from '../../components/ui/Badge';
@@ -8,9 +8,9 @@ import { formatDateTime, formatNumber, truncate } from '../../utils/helpers';
 
 const STATUS_OPTIONS = [
   { label: 'All', value: '' },
-  { label: '2xx Success', value: '2' },
-  { label: '4xx Client Error', value: '4' },
-  { label: '5xx Server Error', value: '5' },
+  { label: '2xx Success', value: '2xx' },
+  { label: '4xx Client Error', value: '4xx' },
+  { label: '5xx Server Error', value: '5xx' },
 ];
 
 export default function AdminApiLogs() {
@@ -22,11 +22,13 @@ export default function AdminApiLogs() {
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
 
+  const prevStatusFilter = useRef(statusFilter);
+
   const load = useCallback(async (p = 1) => {
     setLoading(true);
     try {
       const params = { page: p, limit: 25 };
-      if (statusFilter) params.statusCode = statusFilter;
+      if (statusFilter) params.statusClass = statusFilter;
       const res = await adminApi.getLogs(params);
       setLogs(res.data.data || []);
       setTotal(res.data.meta?.total || 0);
@@ -34,8 +36,15 @@ export default function AdminApiLogs() {
     finally { setLoading(false); }
   }, [statusFilter]);
 
-  useEffect(() => { setPage(1); load(1); }, [statusFilter]);
-  useEffect(() => { load(page); }, [page]);
+  useEffect(() => {
+    if (prevStatusFilter.current !== statusFilter) {
+      prevStatusFilter.current = statusFilter;
+      setPage(1);
+      load(1);
+    } else {
+      load(page);
+    }
+  }, [page, statusFilter]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -57,7 +66,6 @@ export default function AdminApiLogs() {
         subtitle={`${formatNumber(total)} total log entries`}
       />
 
-      {/* Quick stats */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="card-sm flex items-center gap-3">
           <div className="h-2 w-2 rounded-full bg-green-500 shrink-0" />
@@ -82,7 +90,6 @@ export default function AdminApiLogs() {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <form onSubmit={handleSearch} className="relative">
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

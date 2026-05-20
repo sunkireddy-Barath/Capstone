@@ -55,7 +55,6 @@ export default function Sidebar({ open, onClose }) {
 
   return (
     <>
-      {/* Mobile backdrop */}
       {open && (
         <div
           className="fixed inset-0 bg-black/60 z-30 lg:hidden backdrop-blur-sm"
@@ -69,7 +68,6 @@ export default function Sidebar({ open, onClose }) {
           open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         )}
       >
-        {/* Logo */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 bg-brand-600 rounded-lg flex items-center justify-center shrink-0">
@@ -90,7 +88,6 @@ export default function Sidebar({ open, onClose }) {
           </button>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           {links.map(({ to, label, icon, end }) => (
             <NavLink
@@ -113,7 +110,6 @@ export default function Sidebar({ open, onClose }) {
           ))}
         </nav>
 
-        {/* User footer */}
         <div className="p-4 border-t border-gray-800">
           <div className="flex items-center gap-3 mb-3 px-1">
             <div className="h-8 w-8 rounded-full bg-brand-600/20 border border-brand-500/30 flex items-center justify-center text-brand-400 text-sm font-bold shrink-0">

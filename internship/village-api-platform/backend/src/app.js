@@ -10,7 +10,6 @@ const requestLogger = require('./middleware/requestLogger.middleware');
 const { error } = require('./utils/response');
 const logger = require('./utils/logger');
 
-// Route imports
 const authRoutes = require('./routes/auth.routes');
 const b2bRoutes = require('./routes/b2b.routes');
 const adminRoutes = require('./routes/admin.routes');
@@ -19,7 +18,6 @@ const searchRoutes = require('./routes/v1/search.routes');
 
 const app = express();
 
-// ─── Security & Parsing ───────────────────────────────────────────────────────
 app.set('trust proxy', 1);
 app.disable('x-powered-by');
 app.use(
@@ -36,10 +34,8 @@ if (!env.IS_PRODUCTION) {
   app.use(morgan('dev'));
 }
 
-// ─── Request Logging ──────────────────────────────────────────────────────────
 app.use(requestLogger);
 
-// ─── Root ─────────────────────────────────────────────────────────────────────
 app.get('/', (req, res) => {
   res.json({
     name: 'CapStone',
@@ -57,7 +53,6 @@ app.get('/', (req, res) => {
   });
 });
 
-// ─── Health & Readiness ───────────────────────────────────────────────────────
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
@@ -77,7 +72,6 @@ app.get('/ready', async (req, res) => {
   }
 });
 
-// ─── API Routes ───────────────────────────────────────────────────────────────
 const API = `/api/${env.API_VERSION}`;
 
 app.use('/api/auth', authRoutes);
@@ -86,38 +80,31 @@ app.use('/api/admin', adminRoutes);
 app.use(`${API}`, geoRoutes);
 app.use(`${API}/search`, searchRoutes);
 
-// ─── 404 Handler ──────────────────────────────────────────────────────────────
 app.use((req, res) => {
   return error(res, `Route ${req.method} ${req.originalUrl} not found`, 404, 'NOT_FOUND');
 });
 
-// ─── Global Error Handler ─────────────────────────────────────────────────────
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   if (err.isOperational) {
     return error(res, err.message, err.statusCode, err.code, err.details);
   }
-  // Prisma error: unique constraint
   if (err.code === 'P2002') {
     return error(res, 'A record with that value already exists', 409, 'CONFLICT');
   }
-  // Prisma error: record not found
   if (err.code === 'P2025') {
     return error(res, 'Record not found', 404, 'NOT_FOUND');
   }
-
   logger.error('Unhandled error:', { message: err.message, stack: err.stack, code: err.code });
   return error(res, 'An unexpected error occurred', 500, 'INTERNAL_ERROR');
 });
 
-// ─── Start Server ─────────────────────────────────────────────────────────────
 if (require.main === module) {
   const server = app.listen(env.PORT, () => {
-    logger.info(`🚀 CapStone running on port ${env.PORT} [${env.NODE_ENV}]`);
-    logger.info(`📡 API base: http://localhost:${env.PORT}${API}`);
+    logger.info(`CapStone running on port ${env.PORT} [${env.NODE_ENV}]`);
+    logger.info(`API: http://localhost:${env.PORT}${API}`);
   });
 
-  // Handle unhandled rejections
   process.on('unhandledRejection', (reason) => {
     logger.error('Unhandled rejection:', reason);
   });

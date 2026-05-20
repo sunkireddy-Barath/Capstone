@@ -7,14 +7,12 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Attach JWT access token to every request
 api.interceptors.request.use((config) => {
   const token = useAuthStore.getState().accessToken;
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Auto-refresh on 401
 api.interceptors.response.use(
   (res) => res,
   async (err) => {
@@ -38,7 +36,6 @@ api.interceptors.response.use(
 
 export default api;
 
-// ─── Auth ─────────────────────────────────────────────────────────────────────
 export const authApi = {
   register: (data) => api.post('/auth/register', data),
   login: (data) => api.post('/auth/login', data),
@@ -48,7 +45,6 @@ export const authApi = {
   changePassword: (data) => api.put('/auth/change-password', data),
 };
 
-// ─── B2B ──────────────────────────────────────────────────────────────────────
 export const b2bApi = {
   getDashboard: () => api.get('/b2b/dashboard'),
   getAnalytics: (days = 30) => api.get(`/b2b/analytics?days=${days}`),
@@ -60,7 +56,6 @@ export const b2bApi = {
   verifyPayment: (data) => api.post('/b2b/payment/verify', data),
 };
 
-// ─── Admin ────────────────────────────────────────────────────────────────────
 export const adminApi = {
   getStats: () => api.get('/admin/stats'),
   getDailyUsage: (days = 30) => api.get(`/admin/analytics/daily?days=${days}`),

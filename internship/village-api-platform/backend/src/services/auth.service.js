@@ -22,7 +22,6 @@ const register = async ({ email, password, name, company }) => {
   const accessToken = signAccessToken(tokenPayload);
   const refreshToken = signRefreshToken({ id: user.id });
 
-  // Store refresh token in Redis (7 days)
   await redis.set(`refresh:${user.id}`, refreshToken, { ex: 7 * 24 * 3600 });
 
   return { user, accessToken, refreshToken };

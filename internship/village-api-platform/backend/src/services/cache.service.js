@@ -39,9 +39,22 @@ const wrap = async (key, ttl, fetchFn) => {
 };
 
 const invalidatePattern = async (pattern) => {
-  // Upstash does not support SCAN — track keys explicitly or use prefix-based sets
-  // For now we skip pattern invalidation and let TTL handle expiry
-  logger.debug(`Cache invalidate pattern: ${pattern} (TTL-based)`);
+  try {
+    const matchPattern = pattern.endsWith('*') ? pattern : `${pattern}*`;
+    let cursor = 0;
+    const keys = [];
+    do {
+      const [nextCursor, batch] = await redis.scan(cursor, { match: matchPattern, count: 100 });
+      cursor = Number(nextCursor);
+      keys.push(...batch);
+    } while (cursor !== 0);
+    if (keys.length > 0) {
+      await Promise.all(keys.map((k) => redis.del(k)));
+      logger.debug(`Cache invalidated ${keys.length} keys matching "${matchPattern}"`);
+    }
+  } catch (err) {
+    logger.warn(`Cache invalidate pattern "${pattern}" failed:`, err.message);
+  }
 };
 
 module.exports = { get, set, del, wrap, invalidatePattern };

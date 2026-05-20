@@ -32,7 +32,6 @@ const requestLogger = (req, res, next) => {
 
     logger.debug(`${method} ${endpoint} ${statusCode} ${responseTime}ms`);
 
-    // Fire-and-forget async log insert
     prisma.apiLog.create({ data: logData }).catch((err) =>
       logger.warn('Failed to write API log:', err.message)
     );

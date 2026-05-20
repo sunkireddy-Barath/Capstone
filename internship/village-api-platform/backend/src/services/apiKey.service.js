@@ -38,23 +38,27 @@ const createApiKey = async (userId, { name }) => {
     dailyLimit: planLimits.dailyLimit,
   });
 
-  // Return raw secret ONCE — never stored in plain text
   return { ...apiKey, secret };
 };
 
 const listApiKeys = (userId) => apiKeyRepo.findAllByUser(userId);
 
 const revokeApiKey = async (id, userId, userRole) => {
+  const keyId = parseInt(id, 10);
   const keys = await apiKeyRepo.findAllByUser(userId);
-  const key = keys.find((k) => k.id === parseInt(id, 10));
+  const ownedKey = keys.find((k) => k.id === keyId);
 
-  if (!key && userRole !== 'ADMIN') throw new NotFoundError('API key');
-  if (!key) throw new NotFoundError('API key');
+  if (!ownedKey && userRole !== 'ADMIN') throw new NotFoundError('API key');
 
-  // Invalidate Redis cache for this key
-  await cache.del(`apikey:${key.key}`);
+  if (ownedKey) {
+    await cache.del(`apikey:${ownedKey.key}`);
+    return apiKeyRepo.deactivate(keyId);
+  }
 
-  return apiKeyRepo.deactivate(parseInt(id, 10), userId);
+  const anyKey = await apiKeyRepo.findById(keyId);
+  if (!anyKey) throw new NotFoundError('API key');
+  await cache.del(`apikey:${anyKey.key}`);
+  return apiKeyRepo.deactivate(keyId);
 };
 
 const upgradePlan = async (userId, planType) => {
@@ -63,17 +67,16 @@ const upgradePlan = async (userId, planType) => {
 
   const user = await userRepo.update(userId, { planType });
 
-  // Update all active API keys' daily limits
   const keys = await apiKeyRepo.findAllByUser(userId);
   const newLimit = PLAN_LIMITS[planType].dailyLimit;
   await Promise.all(
     keys
       .filter((k) => k.isActive)
       .map((k) =>
-        prisma.apiKey.update({
-          where: { id: k.id },
-          data: { dailyLimit: newLimit },
-        })
+        Promise.all([
+          prisma.apiKey.update({ where: { id: k.id }, data: { dailyLimit: newLimit } }),
+          cache.del(`apikey:${k.key}`),
+        ])
       )
   );
 

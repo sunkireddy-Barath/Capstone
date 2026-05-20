@@ -62,6 +62,14 @@ const getUserDashboard = async (userId) => {
   };
 };
 
+const getUserAnalytics = async (userId, days = 30) => {
+  const [dailyUsage, recentLogs] = await Promise.all([
+    analyticsRepo.getDailyUsageByUser(userId, days),
+    analyticsRepo.getRecentLogs(20, userId),
+  ]);
+  return { dailyUsage, recentLogs };
+};
+
 const getAdminLogs = (filters, pagination) =>
   analyticsRepo.getPaginatedLogs({ ...filters, ...pagination });
 
@@ -70,5 +78,6 @@ module.exports = {
   getSystemDailyUsage,
   getTopEndpoints,
   getUserDashboard,
+  getUserAnalytics,
   getAdminLogs,
 };

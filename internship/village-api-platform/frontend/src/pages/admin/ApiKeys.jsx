@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { adminApi } from '../../services/api';
 import Layout, { PageHeader } from '../../components/layout/Layout';
 import { PlanBadge, StatusBadge } from '../../components/ui/Badge';
@@ -47,11 +47,14 @@ export default function AdminApiKeys() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const toast = useToast();
+  const prevSearch = useRef(search);
 
-  const load = async (p = page) => {
+  const load = async (p = page, q = search) => {
     setLoading(true);
     try {
-      const res = await adminApi.getApiKeys({ page: p, limit: 20 });
+      const params = { page: p, limit: 20 };
+      if (q) params.search = q;
+      const res = await adminApi.getApiKeys(params);
       setKeys(res.data.data || []);
       setTotal(res.data.meta?.total || 0);
     } catch {
@@ -61,15 +64,17 @@ export default function AdminApiKeys() {
     }
   };
 
-  useEffect(() => { load(); }, [page]);
+  useEffect(() => {
+    if (prevSearch.current !== search) {
+      prevSearch.current = search;
+      setPage(1);
+      load(1, search);
+    } else {
+      load(page, search);
+    }
+  }, [page, search]);
 
-  const filtered = search
-    ? keys.filter((k) =>
-        k.key.includes(search) ||
-        k.name.toLowerCase().includes(search.toLowerCase()) ||
-        k.user?.email?.toLowerCase().includes(search.toLowerCase())
-      )
-    : keys;
+  const filtered = keys;
 
   return (
     <Layout>
@@ -84,7 +89,7 @@ export default function AdminApiKeys() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search keys, users…"
+              placeholder="Search keys, names, emails…"
               className="input-base pl-9 py-2 text-sm w-64"
             />
           </div>

@@ -30,7 +30,6 @@ export default function Login() {
   return (
     <div className="min-h-screen flex flex-col" style={{ background: '#060609' }}>
 
-      {/* Ambient background blobs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-40 -left-40 w-[700px] h-[700px] rounded-full opacity-30"
           style={{ background: 'radial-gradient(circle, rgba(79,70,229,0.15) 0%, transparent 70%)' }} />
@@ -40,7 +39,6 @@ export default function Login() {
           style={{ background: 'radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 60%)' }} />
       </div>
 
-      {/* Top nav */}
       <header className="relative z-10 flex items-center justify-between px-8 py-5">
         <div className="flex items-center gap-2.5">
           <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center">
@@ -59,11 +57,9 @@ export default function Login() {
         </div>
       </header>
 
-      {/* Page body */}
       <div className="relative z-10 flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-5xl flex items-center gap-20">
 
-          {/* ── Left: Project info ── */}
           <div className="hidden lg:flex flex-col flex-1">
 
             <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.06] px-3 py-1 mb-8 w-fit">
@@ -120,7 +116,6 @@ export default function Login() {
             </div>
           </div>
 
-          {/* ── Right: Auth form ── */}
           <div className="w-full lg:w-[380px] shrink-0">
             <div className="rounded-2xl border border-white/[0.07] bg-white/[0.03] p-8 backdrop-blur-sm">
 
